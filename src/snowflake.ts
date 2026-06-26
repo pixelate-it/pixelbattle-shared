@@ -11,7 +11,10 @@ export class Snowflake {
         let timestamp = Date.now();
         if (timestamp === this.lastTimestamp) {
             this.sequence = (this.sequence + 1) & 0xfff;
-            if (this.sequence === 0) timestamp = this.waitNextMillis(timestamp);
+            if (this.sequence === 0) {
+                timestamp = this.waitNextMillis(timestamp);
+                this.lastTimestamp = timestamp;
+            }
         } else {
             this.sequence = 0;
         }

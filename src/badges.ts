@@ -1,10 +1,6 @@
 import { FlagsGenerator } from "./flags";
 
-export type BadgeIdentifier =
-    | "DEVELOPER"
-    | "MODERATOR"
-    | "SPONSOR"
-    | "ACTIVE";
+export type BadgeIdentifier = "DEVELOPER" | "MODERATOR" | "SPONSOR" | "ACTIVE";
 
 /**
  * The badges a user can carry, as a bitfield.
@@ -16,5 +12,5 @@ export const badges = new FlagsGenerator<BadgeIdentifier>([
     "DEVELOPER",
     "MODERATOR",
     "SPONSOR",
-    "ACTIVE",
+    "ACTIVE"
 ]);

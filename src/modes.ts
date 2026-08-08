@@ -93,8 +93,54 @@ export const paletteManifest: ModeManifest = {
     defaults: {}
 };
 
+export const infectionManifest: ModeManifest = {
+    id: "infection",
+    name: "Заражение",
+    description:
+        "По холсту расползается заражение: раз в несколько секунд оно " +
+        "занимает соседние пиксели. Чем больше пятно, тем медленнее оно " +
+        "растёт, а когда на сайте никого нет — стоит на месте. Закрасить " +
+        "заражённый пиксель значит вылечить его. Если вывести заражение " +
+        "полностью, через пару минут оно появится заново в случайном месте — " +
+        "так что маленькое пятно выгоднее, чем никакого.",
+    traits: ["paints"],
+    configSchema: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+            color: COLOR,
+            // Pixels per second at `referenceArea`, before any slowdown.
+            baseRate: { type: "number", minimum: 0, maximum: 1000 },
+            referenceArea: { type: "integer", minimum: 1, maximum: 1500000 },
+            // How sharply growth slows as the blot gets bigger. 0 disables it.
+            decay: { type: "number", minimum: 0, maximum: 2 },
+            maxPerTick: { type: "integer", minimum: 1, maximum: 4096 },
+            // Share of the canvas the blot may never exceed.
+            maxAreaFraction: { type: "number", minimum: 0, maximum: 1 },
+            // Players online for the blot to grow at full speed.
+            referenceOnline: { type: "integer", minimum: 1, maximum: 10000 },
+            respawnDelayMs: { type: "integer", minimum: 0, maximum: 86400000 },
+            seedCount: { type: "integer", minimum: 1, maximum: 64 },
+            tickMs: { type: "integer", minimum: 1000, maximum: 3600000 }
+        }
+    },
+    defaults: {
+        color: 0x4b2d5e,
+        baseRate: 4,
+        referenceArea: 1000,
+        decay: 0.5,
+        maxPerTick: 64,
+        maxAreaFraction: 0.6,
+        referenceOnline: 10,
+        respawnDelayMs: 120000,
+        seedCount: 4,
+        tickMs: 1000
+    }
+};
+
 export const MODE_MANIFESTS = {
-    palette: paletteManifest
+    palette: paletteManifest,
+    infection: infectionManifest
 } as const satisfies Record<string, ModeManifest>;
 
 export type ModeId = keyof typeof MODE_MANIFESTS;

@@ -54,6 +54,15 @@ export interface ModeManifest {
     description: string;
     traits: readonly ModeTrait[];
     /**
+     * Colour this mode is shown in, as 0x00RRGGBB.
+     *
+     * A display concern, and it lives here for the same reason the name does:
+     * a mode is named in several places on both sides of the wire - the pixel
+     * it painted, the season's badge, the admin panel - and they should not
+     * each invent their own.
+     */
+    accent: number;
+    /**
      * JSON Schema for this mode's config, flat and fully bounded.
      *
      * Two consumers: the server validates an admin's input against it, and the
@@ -74,6 +83,7 @@ export const paletteManifest: ModeManifest = {
         "В этом сезоне доступен только заданный набор цветов. Всё остальное " +
         "холст не примет.",
     traits: ["constrains"],
+    accent: 0x6c8ebf,
     configSchema: {
         type: "object",
         additionalProperties: false,
@@ -104,6 +114,8 @@ export const infectionManifest: ModeManifest = {
         "полностью, через пару минут оно появится заново в случайном месте — " +
         "так что маленькое пятно выгоднее, чем никакого.",
     traits: ["paints"],
+    // The blot's own colour, so the two never disagree.
+    accent: 0x4b2d5e,
     configSchema: {
         type: "object",
         additionalProperties: false,
@@ -147,6 +159,7 @@ export const decayManifest: ModeManifest = {
         "медленно исчезает. Тронуть пиксель заново достаточно, чтобы " +
         "отсчёт начался сначала.",
     traits: ["paints"],
+    accent: 0x9aa0a6,
     configSchema: {
         type: "object",
         additionalProperties: false,

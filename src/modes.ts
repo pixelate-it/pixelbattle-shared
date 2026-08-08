@@ -138,9 +138,42 @@ export const infectionManifest: ModeManifest = {
     }
 };
 
+export const decayManifest: ModeManifest = {
+    id: "decay",
+    name: "Энтропия",
+    description:
+        "Пиксели, которых давно никто не касался, постепенно выцветают к " +
+        "белому. Рисунок, за которым следят, живёт вечно; заброшенный — " +
+        "медленно исчезает. Тронуть пиксель заново достаточно, чтобы " +
+        "отсчёт начался сначала.",
+    traits: ["paints"],
+    configSchema: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+            // How long a pixel must go untouched before it starts to fade.
+            ageMs: { type: "integer", minimum: 60000, maximum: 604800000 },
+            // Share of the remaining distance to white taken per step.
+            stepFraction: { type: "number", minimum: 0.01, maximum: 1 },
+            maxPerTick: { type: "integer", minimum: 1, maximum: 4096 },
+            // Ticks one full pass over the canvas is spread across.
+            scanTicks: { type: "integer", minimum: 1, maximum: 100000 },
+            tickMs: { type: "integer", minimum: 1000, maximum: 3600000 }
+        }
+    },
+    defaults: {
+        ageMs: 21600000,
+        stepFraction: 0.15,
+        maxPerTick: 256,
+        scanTicks: 600,
+        tickMs: 1000
+    }
+};
+
 export const MODE_MANIFESTS = {
     palette: paletteManifest,
-    infection: infectionManifest
+    infection: infectionManifest,
+    decay: decayManifest
 } as const satisfies Record<string, ModeManifest>;
 
 export type ModeId = keyof typeof MODE_MANIFESTS;

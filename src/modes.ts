@@ -183,10 +183,64 @@ export const decayManifest: ModeManifest = {
     }
 };
 
+export const inflationManifest: ModeManifest = {
+    id: "inflation",
+    name: "Инфляция",
+    description:
+        "Холст растёт, только пока кто-то один держит четверть его пикселей. " +
+        "Как только это происходит, он мгновенно расширяется на два пикселя " +
+        "во все стороны — и четверть от новой площади становится дороже. " +
+        "Если доли не хватает, через пару минут холст сжимается обратно, а " +
+        "всё, что осталось за краем, пропадает навсегда. Держать четверть " +
+        "может только один человек, так что договоритесь, кто это будет, и " +
+        "не закрашивайте его. И рисуйте ближе к середине: у края небезопасно.",
+    traits: ["relocates"],
+    accent: 0xc9803a,
+    configSchema: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+            /* Side of the canvas the season opens on, and the floor it never
+               shrinks below. `maxSide` must be this plus a whole number of
+               steps, or the last step clamps and the frame stops being
+               honest - the server checks. */
+            startSide: { type: "integer", minimum: 4, maximum: 4096 },
+            maxSide: { type: "integer", minimum: 4, maximum: 4096 },
+            /* Pixels added to (or taken from) every side at once. The canvas
+               changes by twice this on each axis. */
+            step: { type: "integer", minimum: 1, maximum: 64 },
+            // Share one player must hold for the canvas to grow.
+            growAt: { type: "number", minimum: 0.01, maximum: 1 },
+            /* Share below which the canvas starts counting down to a cut.
+               Equal to `growAt` by default, which is what makes the canvas
+               breathe at its ceiling rather than rest there; lower it to give
+               the size somewhere to stand still. */
+            shrinkBelow: { type: "number", minimum: 0.01, maximum: 1 },
+            /* Countdown to a cut, on the smallest and the largest canvas. The
+               bigger the canvas the shorter the wait, which is what keeps the
+               size from wandering. */
+            shrinkMaxMs: { type: "integer", minimum: 1000, maximum: 3600000 },
+            shrinkMinMs: { type: "integer", minimum: 1000, maximum: 3600000 },
+            tickMs: { type: "integer", minimum: 1000, maximum: 60000 }
+        }
+    },
+    defaults: {
+        startSide: 8,
+        maxSide: 100,
+        step: 2,
+        growAt: 0.25,
+        shrinkBelow: 0.25,
+        shrinkMaxMs: 180000,
+        shrinkMinMs: 60000,
+        tickMs: 1000
+    }
+};
+
 export const MODE_MANIFESTS = {
     palette: paletteManifest,
     infection: infectionManifest,
-    decay: decayManifest
+    decay: decayManifest,
+    inflation: inflationManifest
 } as const satisfies Record<string, ModeManifest>;
 
 export type ModeId = keyof typeof MODE_MANIFESTS;

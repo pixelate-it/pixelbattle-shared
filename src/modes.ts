@@ -41,10 +41,16 @@ export type ModeTrait =
 
 export interface ModeManifest {
     id: string;
-    /** Shown to players. */
+    /**
+     * A dot-namespaced key into the `modes` domain of the pixelbattle-i18n
+     * catalog (`modes.<id>.name`) - not display text. The frontend resolves
+     * it through `t()`; anything else reading this manifest (this server
+     * included) gets the key, not a name in any language.
+     */
     name: string;
     /**
-     * The rules, in a sentence or two, in the player's language.
+     * The rules, in a sentence or two - `modes.<id>.description` in the same
+     * catalog, same caveat as `name`.
      *
      * Not decoration: a mode whose rules are not stated reads as the game
      * misbehaving. The one that proves it is Infection, which is *meant* to be
@@ -78,10 +84,8 @@ const COLOR = { type: "integer", minimum: 0, maximum: 0xffffff } as const;
 
 export const paletteManifest: ModeManifest = {
     id: "palette",
-    name: "Ограниченная палитра",
-    description:
-        "В этом сезоне доступен только заданный набор цветов. Всё остальное " +
-        "холст не примет.",
+    name: "modes.palette.name",
+    description: "modes.palette.description",
     traits: ["constrains"],
     accent: 0x6c8ebf,
     configSchema: {
@@ -105,14 +109,8 @@ export const paletteManifest: ModeManifest = {
 
 export const infectionManifest: ModeManifest = {
     id: "infection",
-    name: "Заражение",
-    description:
-        "По холсту расползается заражение: раз в несколько секунд оно " +
-        "занимает соседние пиксели. Чем больше пятно, тем медленнее оно " +
-        "растёт, а когда на сайте никого нет — стоит на месте. Закрасить " +
-        "заражённый пиксель значит вылечить его. Если вывести заражение " +
-        "полностью, через пару минут оно появится заново в случайном месте — " +
-        "так что маленькое пятно выгоднее, чем никакого.",
+    name: "modes.infection.name",
+    description: "modes.infection.description",
     traits: ["paints"],
     // The blot's own colour, so the two never disagree.
     accent: 0x4b2d5e,
@@ -152,12 +150,8 @@ export const infectionManifest: ModeManifest = {
 
 export const decayManifest: ModeManifest = {
     id: "decay",
-    name: "Энтропия",
-    description:
-        "Пиксели, которых давно никто не касался, постепенно выцветают к " +
-        "белому. Рисунок, за которым следят, живёт вечно; заброшенный — " +
-        "медленно исчезает. Тронуть пиксель заново достаточно, чтобы " +
-        "отсчёт начался сначала.",
+    name: "modes.decay.name",
+    description: "modes.decay.description",
     traits: ["paints"],
     accent: 0x9aa0a6,
     configSchema: {
@@ -185,15 +179,8 @@ export const decayManifest: ModeManifest = {
 
 export const inflationManifest: ModeManifest = {
     id: "inflation",
-    name: "Инфляция",
-    description:
-        "Холст растёт, только пока кто-то один держит четверть его пикселей. " +
-        "Как только это происходит, он мгновенно расширяется на два пикселя " +
-        "во все стороны — и четверть от новой площади становится дороже. " +
-        "Если доли не хватает, через пару минут холст сжимается обратно, а " +
-        "всё, что осталось за краем, пропадает навсегда. Держать четверть " +
-        "может только один человек, так что договоритесь, кто это будет, и " +
-        "не закрашивайте его. И рисуйте ближе к середине: у края небезопасно.",
+    name: "modes.inflation.name",
+    description: "modes.inflation.description",
     traits: ["relocates"],
     accent: 0xc9803a,
     configSchema: {

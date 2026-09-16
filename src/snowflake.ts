@@ -9,11 +9,19 @@ export class Snowflake {
 
     public generate() {
         let timestamp = Date.now();
+
+        // A clock that moved backward - an NTP correction, a paused VM
+        // resuming - must not reissue an id already minted at this
+        // timestamp/sequence pair, so wait for real time to catch back up
+        // rather than trust Date.now() at face value.
+        if (timestamp < this.lastTimestamp) {
+            timestamp = this.waitNextMillis(this.lastTimestamp);
+        }
+
         if (timestamp === this.lastTimestamp) {
             this.sequence = (this.sequence + 1) & 0xfff;
             if (this.sequence === 0) {
                 timestamp = this.waitNextMillis(timestamp);
-                this.lastTimestamp = timestamp;
             }
         } else {
             this.sequence = 0;
@@ -23,7 +31,10 @@ export class Snowflake {
 
         return (
             (BigInt(timestamp - this.epoch) << BigInt(22)) |
-            (BigInt(this.workerID) << BigInt(12)) |
+            // Masked to the 10-bit field `decode()` reads it back from - an
+            // out-of-range workerID would otherwise bleed into the
+            // timestamp bits directly above it, corrupting both.
+            (BigInt(this.workerID & 0x3ff) << BigInt(12)) |
             BigInt(this.sequence)
         );
     }

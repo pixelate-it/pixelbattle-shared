@@ -12,10 +12,14 @@ export class Snowflake {
 
         // A clock that moved backward - an NTP correction, a paused VM
         // resuming - must not reissue an id already minted at this
-        // timestamp/sequence pair, so wait for real time to catch back up
-        // rather than trust Date.now() at face value.
+        // timestamp/sequence pair. Pinning to the last real timestamp and
+        // falling into the same-millisecond branch below (which only ever
+        // busy-waits for a sub-millisecond sequence rollover) does that
+        // without busy-waiting here for however long the clock stepped back -
+        // unbounded, that would freeze this single-threaded process for the
+        // length of the correction instead of just this one call.
         if (timestamp < this.lastTimestamp) {
-            timestamp = this.waitNextMillis(this.lastTimestamp);
+            timestamp = this.lastTimestamp;
         }
 
         if (timestamp === this.lastTimestamp) {

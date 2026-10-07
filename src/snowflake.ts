@@ -18,14 +18,23 @@ export class Snowflake {
         // without busy-waiting here for however long the clock stepped back -
         // unbounded, that would freeze this single-threaded process for the
         // length of the correction instead of just this one call.
-        if (timestamp < this.lastTimestamp) {
+        const pinned = timestamp < this.lastTimestamp;
+        if (pinned) {
             timestamp = this.lastTimestamp;
         }
 
         if (timestamp === this.lastTimestamp) {
             this.sequence = (this.sequence + 1) & 0xfff;
             if (this.sequence === 0) {
-                timestamp = this.waitNextMillis(timestamp);
+                // While pinned, waiting for the next millisecond means
+                // waiting for the clock to catch up - the very unbounded
+                // freeze the pin exists to avoid, reached after 4096 ids
+                // instead of at once. Step the logical clock instead: the
+                // ids stay unique and ordered, dated at most a little ahead
+                // of a clock that is behind anyway.
+                timestamp = pinned
+                    ? timestamp + 1
+                    : this.waitNextMillis(timestamp);
             }
         } else {
             this.sequence = 0;

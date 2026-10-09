@@ -232,6 +232,9 @@ export const MODE_MANIFESTS = {
 
 export type ModeId = keyof typeof MODE_MANIFESTS;
 
+/* Own keys only: `in` walks the prototype chain, so "constructor" and
+ * "toString" passed, and the registry then threw reading their manifest -
+ * a 500 where an unknown mode is a 400. */
 export function isModeId(value: string): value is ModeId {
-    return value in MODE_MANIFESTS;
+    return Object.hasOwn(MODE_MANIFESTS, value);
 }
